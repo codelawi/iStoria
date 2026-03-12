@@ -1,17 +1,15 @@
 import React from "react";
-import { Text } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Text, View } from "react-native";
 
 const HomeTab = () => {
   return (
-    <SafeAreaView
+    <View
       style={{
         flex: 1,
       }}
-      edges={["top"]}
     >
-      <Text className="p-2 bg-red-100">Home Tab</Text>
-    </SafeAreaView>
+      <Text className="p-2 font-enBold">Home Tab</Text>
+    </View>
   );
 };
 

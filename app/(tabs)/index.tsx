@@ -2,16 +2,17 @@ import { Image } from "expo-image";
 import * as React from "react";
 import { Dimensions, Pressable, Text, View } from "react-native";
 import Animated, {
-    Easing,
-    useAnimatedStyle,
-    useSharedValue,
-    withTiming,
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
 } from "react-native-reanimated";
 
 import EventsTab from "@/pages/events-tab";
 import HomeTab from "@/pages/home-tab";
 import ProfileTab from "@/pages/profile-tab";
 import WordsTab from "@/pages/words-tab";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const homeIcon = require("@/assets/icons/list.png");
 const eventsIcon = require("@/assets/icons/rank.png");
@@ -71,7 +72,18 @@ const CustomBottomTabs = () => {
   const ActiveScreen = TabScreens[routes[index].key];
 
   return (
-    <View style={{ flex: 1 }}>
+    <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
+      <View className="p-4 flex flex-row items-center gap-x-3 justify-center">
+        <Image
+          cachePolicy={"disk"}
+          source={require("@/assets/icons/iStoria.png")}
+          style={{
+            width: 35,
+            height: 35,
+          }}
+        />
+        <Text className="font-enBold text-primary text-2xl">iStoria</Text>
+      </View>
       <View style={{ flex: 1 }}>
         <ActiveScreen />
       </View>
@@ -141,7 +153,7 @@ const CustomBottomTabs = () => {
           />
         </Animated.View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 

@@ -29,5 +29,5 @@ export default function Index() {
     );
   }
 
-  return null; // This will never be visible since we navigate on fontsLoaded
+  return null;
 }

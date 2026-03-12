@@ -5,7 +5,7 @@ import Animated, {
     Easing,
     useAnimatedStyle,
     useSharedValue,
-    withTiming
+    withTiming,
 } from "react-native-reanimated";
 
 import EventsTab from "@/pages/events-tab";

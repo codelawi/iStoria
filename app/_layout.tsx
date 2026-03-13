@@ -1,4 +1,5 @@
 // RootLayout.jsx
+import { ModalProvider } from "@/contexts/modal-context";
 import {
   ThemeProviderContext,
   useThemeContext,
@@ -23,8 +24,10 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ThemeProviderContext>
-        <AppContent />
-        <Toaster />
+        <ModalProvider>
+          <AppContent />
+          <Toaster />
+        </ModalProvider>
       </ThemeProviderContext>
     </GestureHandlerRootView>
   );

@@ -83,7 +83,7 @@ const CustomBottomTabs = () => {
     }
   };
 
-  const animateToTab = (newIndex) => {
+  const animateToTab = (newIndex: any) => {
     // Slide indicator
     translateX.value = withTiming(newIndex * tabWidth, {
       duration: 210,

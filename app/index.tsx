@@ -1,7 +1,8 @@
+import Loader from "@/components/loader";
 import { loadFonts } from "@/services/font-loader";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, View } from "react-native";
+import { View } from "react-native";
 
 export default function Index() {
   const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -24,7 +25,7 @@ export default function Index() {
     // Optional: show a small loader instead of blank screen
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" color="#5b71ff" />
+        <Loader />
       </View>
     );
   }

@@ -1,3 +1,5 @@
+import { Audio } from "expo-av";
+import * as Haptics from "expo-haptics";
 import { Image } from "expo-image";
 import * as React from "react";
 import { Dimensions, Pressable, Text, View } from "react-native";
@@ -7,12 +9,12 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import EventsTab from "@/pages/events-tab";
 import HomeTab from "@/pages/home-tab";
 import ProfileTab from "@/pages/profile-tab";
 import WordsTab from "@/pages/words-tab";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 const homeIcon = require("@/assets/icons/list.png");
 const eventsIcon = require("@/assets/icons/rank.png");
@@ -49,7 +51,39 @@ const CustomBottomTabs = () => {
   const translateX = useSharedValue(0);
   const scale = useSharedValue(1);
 
-  const animateToTab = (newIndex: number) => {
+  const soundRef = React.useRef(null);
+
+  // Load sound once
+  React.useEffect(() => {
+    let sound;
+    const loadSound = async () => {
+      const { sound: loadedSound } = await Audio.Sound.createAsync(
+        require("@/assets/sounds/click.mp3"),
+      );
+      sound = loadedSound;
+      soundRef.current = loadedSound;
+    };
+
+    loadSound();
+
+    return () => {
+      if (sound) {
+        sound.unloadAsync();
+      }
+    };
+  }, []);
+
+  const playSound = async () => {
+    try {
+      if (soundRef.current) {
+        await soundRef.current.replayAsync(); // fast replay
+      }
+    } catch (e) {
+      console.warn("Sound play error:", e);
+    }
+  };
+
+  const animateToTab = (newIndex) => {
     // Slide indicator
     translateX.value = withTiming(newIndex * tabWidth, {
       duration: 210,
@@ -61,7 +95,6 @@ const CustomBottomTabs = () => {
       scale.value = withTiming(1, { duration: 100 });
     });
 
-    // Update index state
     setIndex(newIndex);
   };
 
@@ -69,23 +102,42 @@ const CustomBottomTabs = () => {
     transform: [{ translateX: translateX.value }, { scale: scale.value }],
   }));
 
-  const ActiveScreen = TabScreens[routes[index].key];
-
   return (
     <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
-      <View className="p-4 flex flex-row items-center gap-x-3 justify-center">
-        <Image
-          cachePolicy={"disk"}
-          source={require("@/assets/icons/iStoria.png")}
-          style={{
-            width: 35,
-            height: 35,
-          }}
-        />
-        <Text className="font-enBold text-primary text-2xl">iStoria</Text>
+      {/* Header */}
+      <View className="p-4 flex flex-row items-center gap-x-3 justify-between">
+        <View className="flex flex-row items-center gap-x-4">
+          <Image
+            cachePolicy={"disk"}
+            source={require("@/assets/icons/fire.png")}
+            style={{ width: 35, height: 35 }}
+          />
+          <Text className="font-enBold text-2xl">12</Text>
+        </View>
+
+        <View className="flex flex-row items-center gap-x-4">
+          <Image
+            cachePolicy={"disk"}
+            source={require("@/assets/icons/bolt.png")}
+            style={{ width: 35, height: 35 }}
+          />
+          <Text className="font-enBold text-2xl">12</Text>
+        </View>
       </View>
+
+      {/* All Screens Mounted */}
       <View style={{ flex: 1 }}>
-        <ActiveScreen />
+        {routes.map((route, idx) => {
+          const Screen = TabScreens[route.key];
+          return (
+            <View
+              key={route.key}
+              style={{ flex: 1, display: index === idx ? "flex" : "none" }}
+            >
+              <Screen />
+            </View>
+          );
+        })}
       </View>
 
       {/* Bottom Tab Bar */}
@@ -101,7 +153,11 @@ const CustomBottomTabs = () => {
           <Pressable
             key={route.key}
             style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-            onPress={() => animateToTab(idx)}
+            onPress={async () => {
+              Haptics.impactAsync();
+              playSound();
+              animateToTab(idx);
+            }}
           >
             <Image
               cachePolicy="disk"
@@ -110,12 +166,12 @@ const CustomBottomTabs = () => {
                 width: 28,
                 height: 28,
                 marginBottom: 10,
-                tintColor: index === idx ? "#5b71ff" : "#888",
+                tintColor: index === idx ? "#5b71ff" : "#1f3252ff",
               }}
             />
             <Text
               style={{
-                color: index === idx ? "#5b71ff" : "#888",
+                color: index === idx ? "#5b71ff" : "#1f3252ff",
                 fontWeight: "bold",
                 fontFamily: "english-bold",
                 zIndex: 2,

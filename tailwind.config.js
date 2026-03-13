@@ -10,6 +10,7 @@ module.exports = {
     extend: {
       colors: {
         primary: "#5b71ff",
+        secondary: "#1f3252ff",
       },
       fontFamily: {
         enBold: "english-bold",

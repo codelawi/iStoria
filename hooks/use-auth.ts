@@ -88,7 +88,8 @@ export const useAuth = () => {
       return;
     }
 
-    await AsyncStorage.removeItem("user-data");
+    await AsyncStorage.clear();
+
     toast.success("Account deleted successfully");
 
     setAuth(false);
@@ -97,9 +98,23 @@ export const useAuth = () => {
     generateRandomUser();
   };
 
+  const updateLocalData = async (fullName: string) => {
+    const newData = {
+      fullName,
+      uId: userData.uId,
+    };
+    setLoading(true);
+    const payloadToSaveLocaly = JSON.stringify(newData);
+    await AsyncStorage.setItem("user-data", payloadToSaveLocaly);
+    setUserData(newData);
+    fetchUserData();
+    toast.success("Profile updated successfully");
+  };
+
   return {
     isAuthenticated,
     deleteAccount,
+    updateLocalData,
     loading,
     userData,
   };

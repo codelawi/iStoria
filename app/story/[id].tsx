@@ -1,13 +1,13 @@
-import { supabase } from "@/lib/supabase";
-import React, { useEffect, useState } from "react";
-import { ScrollView, Text, View } from "react-native";
-
 import Loader from "@/components/loader";
 import WordTooltip from "@/components/word-tooltip";
+import { supabase } from "@/lib/supabase";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Audio } from "expo-av";
 import * as Haptics from "expo-haptics";
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
+import React, { useEffect, useRef, useState } from "react";
+import { ScrollView, Text, View } from "react-native";
 import { IconButton } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { toast } from "sonner-native";
@@ -25,6 +25,52 @@ const Phase = () => {
   useEffect(() => {
     fetchStory();
   }, []);
+
+  const soundRef = useRef<Audio.Sound | null>(null);
+
+  // Load sound once
+  useEffect(() => {
+    const loadSound = async () => {
+      try {
+        const { sound: loadedSound } = await Audio.Sound.createAsync(
+          require("@/assets/sounds/add-word.mp3"),
+        );
+        soundRef.current = loadedSound;
+      } catch (error) {
+        console.warn("Error loading sound:", error);
+      }
+    };
+
+    loadSound();
+
+    return () => {
+      if (soundRef.current) {
+        soundRef.current.unloadAsync();
+        soundRef.current = null;
+      }
+    };
+  }, []);
+
+  const playSound = async () => {
+    try {
+      if (soundRef.current) {
+        // Check the current status before replaying
+        const status = await soundRef.current.getStatusAsync();
+        if (status.isLoaded) {
+          await soundRef.current.replayAsync();
+        } else {
+          // Reload the sound if it's not loaded
+          const { sound: loadedSound } = await Audio.Sound.createAsync(
+            require("@/assets/sounds/add-word.mp3"),
+          );
+          soundRef.current = loadedSound;
+          await soundRef.current.playAsync();
+        }
+      }
+    } catch (e) {
+      console.warn("Sound play error:", e);
+    }
+  };
 
   const generateRandomId = (): string => {
     const characters = "abcdefghijklmnopqrstuvwxyz0123456789";
@@ -57,6 +103,7 @@ const Phase = () => {
 
   const saveWordAnimation = () => {
     Haptics.notificationAsync();
+    playSound();
     setWordIconStyle({
       width: 40,
       height: 40,
